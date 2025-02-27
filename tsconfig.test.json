@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "jsxImportSource": "react",
+    "types": ["jest"]
+  }
+}
