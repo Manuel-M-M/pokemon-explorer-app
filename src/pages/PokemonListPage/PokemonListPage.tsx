@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { usePokemonListStore } from "../../store/PokemonListStore/PokemonListStore";
 import { PokemonList } from "../../components/PokemonList/PokemonList";
-import { Loader } from "../../components/Loader/Loader";
 import styled from "styled-components";
 
 const PokemonListContainer = styled.section`
@@ -53,8 +52,7 @@ export const PokemonListPage = () => {
 
   return (
     <PokemonListContainer>
-      <PokemonList pokemons={pokemons} />
-      {loading && <Loader />}
+      <PokemonList pokemons={pokemons} loading={loading} />
       <div ref={lastPokemonRef} />{" "}
     </PokemonListContainer>
   );

@@ -75,15 +75,13 @@ export const PokemonCard: React.FC<PokemonBasic> = ({
   types,
 }) => {
   return (
-    <Card data-testid="pokemon-card" className="Card">
+    <Card data-testid="pokemon-card">
       <ImageLink to={`/pokemon/${id}`}>
         <Image src={image} alt={name} />
       </ImageLink>
-      <InfoContainer className="InfoContainer">
-        <Name data-testid="pokemon-name" className="Name">
-          <PokemonNumber data-testid="pokemon-number" className="Number">
-            {id}
-          </PokemonNumber>{" "}
+      <InfoContainer>
+        <Name data-testid="pokemon-name">
+          <PokemonNumber data-testid="pokemon-number">{id}</PokemonNumber>{" "}
           {name}
         </Name>
         <TypesContainer>

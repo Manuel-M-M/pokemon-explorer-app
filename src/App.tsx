@@ -1,15 +1,30 @@
 import styled from "styled-components";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
-import { PokemonListPage } from "./pages/PokemonListPage/PokemonListPage";
-import { FavoritesListPage } from "./pages/FavoritesListPage/FavoritesListPage";
 import { GlobalStyles } from "./styles/globalStyles";
 import { Header } from "./components/Header/Header";
+import { Loader } from "./components/Loader/Loader";
+
+const PokemonListPage = lazy(() =>
+  import("./pages/PokemonListPage/PokemonListPage").then((m) => ({
+    default: m.PokemonListPage,
+  }))
+);
+const FavoritesListPage = lazy(() =>
+  import("./pages/FavoritesListPage/FavoritesListPage").then((m) => ({
+    default: m.FavoritesListPage,
+  }))
+);
+const PokemonDetailsPage = lazy(() =>
+  import("./pages/PokemonDetailsPage/PokemonDetailsPage").then((m) => ({
+    default: m.PokemonDetailsPage,
+  }))
+);
 
 const AppContainer = styled.div`
   display: flex;
@@ -37,8 +52,30 @@ const App = () => {
       <AppContainer>
         <Header />
         <Routes>
-          <Route path="/" element={<PokemonListPage />} />
-          <Route path="/favorites" element={<FavoritesListPage />} />
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<Loader />}>
+                <PokemonListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <Suspense fallback={<Loader />}>
+                <FavoritesListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/pokemon/:id"
+            element={
+              <Suspense fallback={<Loader />}>
+                <PokemonDetailsPage />
+              </Suspense>
+            }
+          />
         </Routes>
       </AppContainer>
     </Router>

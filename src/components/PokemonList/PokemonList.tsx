@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 interface PokemonListProps {
   pokemons: PokemonBasic[];
+  loading: boolean;
 }
 
 const PokemonListWrapper = styled.div`
@@ -23,8 +24,11 @@ const NoPokemons = styled.p`
   text-align: center;
 `;
 
-export const PokemonList: React.FC<PokemonListProps> = ({ pokemons }) => {
-  if (!pokemons.length) {
+export const PokemonList: React.FC<PokemonListProps> = ({
+  pokemons,
+  loading,
+}) => {
+  if (!loading && !pokemons.length) {
     return <NoPokemons>No Pokémon available</NoPokemons>;
   }
 
