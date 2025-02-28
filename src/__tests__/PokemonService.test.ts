@@ -1,5 +1,8 @@
 import { PokemonService } from "../application/PokemonService";
-import { getPokemonList } from "../infrastructure/PokemonRepository";
+import {
+  getPokemonById,
+  getPokemonList,
+} from "../infrastructure/PokemonRepository";
 
 const pokemonNames: Record<number, string> = {
   1: "bulbasaur",
@@ -17,6 +20,7 @@ const pokemonTypes: Record<number, string> = {
 
 jest.mock("../infrastructure/PokemonRepository", () => ({
   getPokemonList: jest.fn(),
+  getPokemonById: jest.fn(),
 }));
 
 global.fetch = jest.fn();
@@ -96,5 +100,56 @@ describe("PokemonService", () => {
     await expect(pokemonService.fetchPokemonList(1)).rejects.toThrow(
       "API error"
     );
+  });
+
+  test("fetches details of a Pokémon successfully", async () => {
+    (getPokemonById as jest.Mock).mockResolvedValue({
+      id: 1,
+      name: "bulbasaur",
+      sprites: {
+        front_default: "https://pokeapi.co/api/v2/sprite/1",
+        other: {
+          "official-artwork": {
+            front_default: "https://pokeapi.co/api/v2/artwork/1",
+          },
+        },
+      },
+      types: [{ type: { name: "grass" } }],
+      height: 7,
+      weight: 69,
+      stats: [
+        { stat: { name: "hp" }, base_stat: 45 },
+        { stat: { name: "attack" }, base_stat: 49 },
+      ],
+      abilities: [{ ability: { name: "overgrow" } }],
+      moves: [{ move: { name: "tackle" } }],
+    });
+
+    const pokemon = await pokemonService.fetchPokemonDetails(1);
+
+    expect(getPokemonById).toHaveBeenCalledWith(1);
+    expect(pokemon).toEqual({
+      id: 1,
+      name: "bulbasaur",
+      image: "https://pokeapi.co/api/v2/artwork/1",
+      types: ["grass"],
+      height: 7,
+      weight: 69,
+      stats: [
+        { name: "HP", value: 45 },
+        { name: "Attack", value: 49 },
+      ],
+      abilities: ["overgrow"],
+      moves: ["tackle"],
+    });
+  });
+
+  test("fetchPokemonDetails returns null if API call fails", async () => {
+    (getPokemonById as jest.Mock).mockRejectedValue(new Error("API error"));
+
+    const pokemon = await pokemonService.fetchPokemonDetails(1);
+
+    expect(getPokemonById).toHaveBeenCalledWith(1);
+    expect(pokemon).toBeNull();
   });
 });
