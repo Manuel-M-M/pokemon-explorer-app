@@ -10,5 +10,6 @@ export const getPokemonList = async (
     throw new Error("Failed to fetch Pokémon");
   }
   const data: PokemonListResponse = await response.json();
+
   return data.results;
 };

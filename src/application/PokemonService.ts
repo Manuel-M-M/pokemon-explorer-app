@@ -9,26 +9,50 @@ export class PokemonService {
     const offset = (page - 1) * limit;
     const rawPokemons = await getPokemonList(offset);
 
-    const pokemonList: PokemonBasic[] = await Promise.all(
-      rawPokemons.map(async (pokemon) => {
-        const id = Number(pokemon.url.split("/").filter(Boolean).pop());
+    const pokemonList = (
+      await Promise.all(
+        rawPokemons.map(async (pokemon) => {
+          try {
+            const id = this.extractIdFromUrl(pokemon.url);
 
-        const pokemonResponse = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${id}`
-        );
-        const pokemonData = await pokemonResponse.json();
+            if (!id) {
+              return null;
+            }
 
-        return {
-          id,
-          name: pokemonData.name,
-          image: pokemonData.sprites.front_default,
-          types: pokemonData.types.map(
-            (t: { type: { name: string } }) => t.type.name
-          ),
-        };
-      })
-    );
+            const pokemonResponse = await fetch(
+              `https://pokeapi.co/api/v2/pokemon/${id}`
+            );
+
+            if (!pokemonResponse.ok) {
+              return null;
+            }
+
+            const pokemonData = await pokemonResponse.json();
+
+            return {
+              id,
+              name: pokemonData.name,
+              image: pokemonData.sprites?.front_default || "",
+              types: Array.isArray(pokemonData.types)
+                ? pokemonData.types.map(
+                    (t: { type: { name: string } }) => t.type.name
+                  )
+                : ["Unknown"],
+            } as PokemonBasic;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (error) {
+            return null;
+          }
+        })
+      )
+    ).filter((p): p is PokemonBasic => p !== null);
 
     return pokemonList;
+  }
+
+  private extractIdFromUrl(url: string): number | null {
+    const parts = url.split("/").filter(Boolean);
+    const id = Number(parts[parts.length - 1]);
+    return isNaN(id) ? null : id;
   }
 }
