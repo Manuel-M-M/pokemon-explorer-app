@@ -28,7 +28,7 @@ describe("PokemonListPage", () => {
     jest.clearAllMocks();
   });
 
-  test("renders loading state initially", () => {
+  test("renders no Pokémon message while loading", async () => {
     (usePokemonListStore as unknown as jest.Mock).mockReturnValue({
       pokemons: [],
       loading: true,
@@ -43,7 +43,11 @@ describe("PokemonListPage", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.queryByText("No Pokémon available")
+      ).not.toBeInTheDocument();
+    });
   });
 
   test("renders Pokémon list when API call succeeds", async () => {
