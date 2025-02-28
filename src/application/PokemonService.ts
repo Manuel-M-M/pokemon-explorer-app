@@ -1,5 +1,12 @@
-import { getPokemonList } from "../infrastructure/PokemonRepository";
-import { PokemonBasic } from "../interfaces/Pokemon";
+import {
+  getPokemonById,
+  getPokemonList,
+} from "../infrastructure/PokemonRepository";
+import {
+  PokemonBasic,
+  PokemonDetailed,
+  PokemonStat,
+} from "../interfaces/Pokemon";
 
 export class PokemonService {
   async fetchPokemonList(
@@ -48,6 +55,45 @@ export class PokemonService {
     ).filter((p): p is PokemonBasic => p !== null);
 
     return pokemonList;
+  }
+
+  async fetchPokemonDetails(id: number): Promise<PokemonDetailed | null> {
+    try {
+      const data = await getPokemonById(id);
+      return {
+        id: data.id,
+        name: data.name,
+        image: data.sprites?.other?.["official-artwork"]?.front_default || "",
+        types: data.types.map((t: { type: { name: string } }) => t.type.name),
+        height: data.height,
+        weight: data.weight,
+        stats: this.mapStats(data.stats),
+        abilities: data.abilities.map(
+          (a: { ability: { name: string } }) => a.ability.name
+        ),
+        moves: data.moves.map((m: { move: { name: string } }) => m.move.name),
+      };
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  private mapStats(
+    stats: { stat: { name: string }; base_stat: number }[]
+  ): PokemonStat[] {
+    const statNames = [
+      "HP",
+      "Attack",
+      "Defense",
+      "Special Attack",
+      "Special Defense",
+      "Speed",
+    ];
+    return stats.map((s, index) => ({
+      name: statNames[index] || s.stat.name,
+      value: s.base_stat,
+    }));
   }
 
   private extractIdFromUrl(url: string): number | null {

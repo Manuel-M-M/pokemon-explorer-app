@@ -1,4 +1,7 @@
-import { PokemonListResponse } from "../interfaces/Pokemon";
+import {
+  PokemonByIdResponse,
+  PokemonListResponse,
+} from "../interfaces/Pokemon";
 
 export const getPokemonList = async (
   offset: number
@@ -12,4 +15,12 @@ export const getPokemonList = async (
   const data: PokemonListResponse = await response.json();
 
   return data.results;
+};
+
+export const getPokemonById = async (
+  id: number
+): Promise<PokemonByIdResponse> => {
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  if (!response.ok) throw new Error(`Failed to fetch Pokémon with ID: ${id}`);
+  return response.json();
 };
