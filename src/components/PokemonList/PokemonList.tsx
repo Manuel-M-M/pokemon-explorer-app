@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 interface PokemonListProps {
   pokemons: PokemonBasic[];
-  loading: boolean;
+  loading?: boolean;
 }
 
 const PokemonListWrapper = styled.div`
